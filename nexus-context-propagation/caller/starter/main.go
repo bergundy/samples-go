@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/temporalio/samples-go/ctxpropagation"
+	nexuscontextpropagation "github.com/temporalio/samples-go/nexus-context-propagation"
 	"github.com/temporalio/samples-go/nexus/caller" // NOTE: reusing the generic nexus caller workflow
 	"github.com/temporalio/samples-go/nexus/options"
 	"github.com/temporalio/samples-go/nexus/service"
@@ -21,6 +22,7 @@ func main() {
 	}
 	// Set up context propagators from workflow and non-workflow contexts.
 	clientOptions.ContextPropagators = []workflow.ContextPropagator{ctxpropagation.NewContextPropagator()}
+	clientOptions.DataConverter = nexuscontextpropagation.DataConverter()
 	c, err := client.Dial(clientOptions)
 	if err != nil {
 		log.Fatalln("Unable to create client", err)
@@ -32,10 +34,6 @@ func main() {
 		TaskQueue: caller.TaskQueue,
 	}
 
-	ctx = context.WithValue(ctx, ctxpropagation.PropagateKey, ctxpropagation.Values{
-		Key:   "caller-id",
-		Value: "samples-go",
-	})
 	wr, err := c.ExecuteWorkflow(ctx, workflowOptions, caller.HelloCallerWorkflow, "Nexus", service.ES)
 	if err != nil {
 		log.Fatalln("Unable to execute workflow", err)

@@ -10,7 +10,6 @@ import (
 	"go.temporal.io/sdk/temporalnexus"
 	"go.temporal.io/sdk/workflow"
 
-	"github.com/temporalio/samples-go/ctxpropagation"
 	"github.com/temporalio/samples-go/nexus/service"
 )
 
@@ -27,11 +26,6 @@ var HelloOperation = temporalnexus.NewWorkflowRunOperation(service.HelloOperatio
 })
 
 func HelloHandlerWorkflow(ctx workflow.Context, input service.HelloInput) (service.HelloOutput, error) {
-	values, ok := ctx.Value(ctxpropagation.PropagateKey).(ctxpropagation.Values)
-	if ok {
-		input.Name += ", " + values.Key + ": " + values.Value
-	}
-
 	switch input.Language {
 	case service.EN:
 		return service.HelloOutput{Message: "Hello " + input.Name + " 👋"}, nil
